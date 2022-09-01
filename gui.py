@@ -2,10 +2,8 @@ import sys
 import traceback
 import threading
 import tkinter as tk
-from tkinter.filedialog import askopenfile
-
+from tkinter.filedialog import askopenfiles
 from decrypt import decrypt_file, CustomException
-
 
 class StdoutRedirector(object):
     def __init__(self, text_widget):
@@ -16,19 +14,32 @@ class StdoutRedirector(object):
         self.text_space.see('end')
 
 
-def open_file():
-    file = askopenfile(filetypes=[
-        ("PDF/CAJ Files", "*")])
-    if not file:
-        return
-    src = file.name
-    dst_array = src.split(".")[:-1]
-    dst_array.append("dec")
-    dst_array.append("pdf")
-    dst = ".".join(dst_array)
-    print("开始解密", src)
-    threading.Thread(target=decrypt_background, args=(src, dst)).start()
+# def open_file():
+#     file = askopenfile(filetypes=[
+#         ("PDF/CAJ Files", "*")])
+#     if not file:
+#         return
+#     src = file.name
+#     dst_array = src.split(".")[:-1]
+#     dst_array.append("dec")
+#     dst_array.append("pdf")
+#     dst = ".".join(dst_array)
+#     print("开始解密", src)
+#     threading.Thread(target=decrypt_background, args=(src, dst)).start()
 
+def open_files():
+    files = askopenfiles(filetypes=[
+        ("PDF/CAJ Files", "*")])
+    if not files:
+        return
+    for file in files:
+        src = file.name
+        dst_array = src.split(".")[:-1]
+        dst_array.append("dec")
+        dst_array.append("pdf")
+        dst = ".".join(dst_array)
+        print("开始解密", src)
+        threading.Thread(target=decrypt_background, args=(src, dst)).start()
 
 def decrypt_background(src, dst):
     try:
@@ -48,7 +59,7 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.title("ScienceDecrypting")
     root.geometry("800x600")
-    btn = tk.Button(root, text='选择要解密的文件', command=lambda: open_file())
+    btn = tk.Button(root, text='选择要解密的文件', command=lambda: open_files())
     btn.pack(side=tk.TOP, pady=20)
     LOG = tk.Text(root)
     LOG.pack()
